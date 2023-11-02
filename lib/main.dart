@@ -46,7 +46,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future getFlipkartData() async {
-    String term = search!.replaceAll(' ', '%');
+    List<String> terms = search!.split(' ');
+    print(terms);
+    int i = 0;
+    for (String x in terms) {
+      try {
+        if (int.parse(x) > 0) {
+          print('yes');
+          print('20$x');
+          terms[i] = '20$x';
+          print(terms[i]);
+        }
+      } catch (e) {}
+      i += 1;
+    }
+    print(terms);
+    String concatenatedString = terms.join(' ');
+    String term = concatenatedString.replaceAll(' ', '%');
     print('search word ${term}');
     final url = Uri.parse(
         'https://www.flipkart.com/search?q=${term}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off');
@@ -85,19 +101,29 @@ class _MyHomePageState extends State<MyHomePage> {
         .toList();
 
     print('count: ${prices[0]}');
+    double avg = 0;
+    for (int i = 0; i < 5; i++) {
+      avg += double.parse(prices[i]);
+    }
 
-    setState(() {
-      articles.addAll(List.generate(
-        5,
-        (index) => Article(
-          url: 'urls[index]',
-          title: titles[index],
-          urlImage: images[index],
-          price: double.parse(prices[index]),
-          reviews: reviews[index],
-        ),
-      ));
-    });
+    avg = avg / 5;
+
+    for (int i = 0; i < 5; i++) {
+      if (double.parse(prices[i]) > (avg / 2) &&
+          double.parse(prices[i]) < (avg * 1.5)) {
+        setState(() {
+          articles.add(
+            Article(
+              url: 'urls[i]',
+              title: titles[i],
+              urlImage: images[i],
+              price: double.parse(prices[i]),
+              reviews: reviews[i],
+            ),
+          );
+        });
+      }
+    }
   }
 
   Future getAmazonData() async {
@@ -135,23 +161,50 @@ class _MyHomePageState extends State<MyHomePage> {
         .toList();
 
     print('count: ${prices[0]}');
+    double avg = 0;
+    for (int i = 0; i < 5; i++) {
+      avg += double.parse(prices[i]);
+    }
 
-    setState(() {
-      articles.addAll(List.generate(
-        5,
-        (index) => Article(
-          url: urls[index],
-          title: titles[index],
-          urlImage: images[index],
-          price: double.parse(prices[index]),
-          reviews: reviews[index],
-        ),
-      ));
-    });
+    avg = avg / 5;
+    print(avg);
+
+    for (int i = 0; i < 5; i++) {
+      if (double.parse(prices[i]) > (avg / 2) &&
+          double.parse(prices[i]) < (avg * 1.5)) {
+        setState(() {
+          articles.add(
+            Article(
+              url: urls[i],
+              title: titles[i],
+              urlImage: images[i],
+              price: double.parse(prices[i]),
+              reviews: reviews[i],
+            ),
+          );
+        });
+      }
+    }
+
+    // setState(() {
+    //   articles.addAll(
+    //     List.generate(
+    //       5,
+    //       (index) => Article(
+    //         url: urls[index],
+    //         title: titles[index],
+    //         urlImage: images[index],
+    //         price: double.parse(prices[index]),
+    //         reviews: reviews[index],
+    //       ),
+    //     ),
+    //   );
+    // });
   }
 
   TextEditingController searchword = TextEditingController();
   String? search;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -201,11 +254,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         hintText: 'Enter a search item',
                       ),
-                      onSubmitted: (value) {
+                      onSubmitted: (value) async {
                         setState(() {
+                          isLoading = true;
                           search = value;
-                          getAmazonData();
-                          getFlipkartData();
+                          articles.clear();
+                        });
+                        await getAmazonData();
+                        await getFlipkartData();
+                        setState(() {
+                          isLoading = false;
                         });
                       },
                     ),
@@ -232,12 +290,87 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
               Expanded(
-                child: ListView.builder(
+                child: GridView.builder(
+                  physics: BouncingScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: MediaQuery.of(context).size.width /
+                        ((MediaQuery.of(context).size.height * 0.75)),
+                  ),
                   padding: const EdgeInsets.all(12),
                   itemCount: articles.length,
                   itemBuilder: (context, index) {
                     final article = articles[index];
-                    return ListTile(
+                    return Container(
+                      margin: EdgeInsets.all(10),
+                      // padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color(0xFFEEEFF2),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            height: 130,
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  article.urlImage,
+                                  fit: BoxFit.cover,
+                                )),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                            ),
+                            child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    article.title,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text(
+                                        '\₹ ${article.price.toString()}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Color(0xff26577C),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12.0, horizontal: 12),
+                                          child: FaIcon(
+                                            FontAwesomeIcons.chevronRight,
+                                            color: Colors.white,
+                                            size: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ]),
+                          )
+                        ],
+                      ),
+                    );
+                    ListTile(
                       leading: Image.network(
                         article.urlImage,
                         width: 50,
@@ -250,6 +383,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
               ),
+              isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container(),
             ],
           ),
         ),
