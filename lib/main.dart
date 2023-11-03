@@ -1,5 +1,6 @@
-import 'dart:ffi';
+// ignore_for_file: unused_local_variable
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -47,25 +48,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future getFlipkartData() async {
     List<String> terms = search!.split(' ');
-    print(terms);
     int i = 0;
     for (String x in terms) {
       try {
         if (int.parse(x) > 0) {
-          print('yes');
-          print('20$x');
           terms[i] = '20$x';
-          print(terms[i]);
         }
-      } catch (e) {}
+      } catch (e) {
+        if (kDebugMode) {
+          print(e);
+        }
+      }
       i += 1;
     }
-    print(terms);
     String concatenatedString = terms.join(' ');
     String term = concatenatedString.replaceAll(' ', '%');
-    print('search word ${term}');
     final url = Uri.parse(
-        'https://www.flipkart.com/search?q=${term}&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off');
+        'https://www.flipkart.com/search?q=$term&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off');
     final response = await http.get(url);
     dom.Document html = dom.Document.html(response.body);
 
@@ -100,7 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
         .map((e) => e.innerHtml.trim())
         .toList();
 
-    print('count: ${prices[0]}');
     double avg = 0;
     for (int i = 0; i < 5; i++) {
       avg += double.parse(prices[i]);
@@ -116,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Article(
               url: 'urls[i]',
               title: titles[i],
+              store: 'flipkart',
               urlImage: images[i],
               price: double.parse(prices[i]),
               reviews: reviews[i],
@@ -128,8 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future getAmazonData() async {
     String term = search!.replaceAll(' ', '+');
-    print('search word ${term}');
-    final url = Uri.parse('https://www.amazon.in/s?k=${term}&ref=nb_sb_noss_2');
+    final url = Uri.parse('https://www.amazon.in/s?k=$term&ref=nb_sb_noss_2');
     final response = await http.get(url);
     dom.Document html = dom.Document.html(response.body);
 
@@ -160,14 +158,12 @@ class _MyHomePageState extends State<MyHomePage> {
         .map((e) => e.innerHtml.trim())
         .toList();
 
-    print('count: ${prices[0]}');
     double avg = 0;
     for (int i = 0; i < 5; i++) {
       avg += double.parse(prices[i]);
     }
 
     avg = avg / 5;
-    print(avg);
 
     for (int i = 0; i < 5; i++) {
       if (double.parse(prices[i]) > (avg / 2) &&
@@ -177,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Article(
               url: urls[i],
               title: titles[i],
+              store: 'amazon',
               urlImage: images[i],
               price: double.parse(prices[i]),
               reviews: reviews[i],
@@ -185,21 +182,6 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     }
-
-    // setState(() {
-    //   articles.addAll(
-    //     List.generate(
-    //       5,
-    //       (index) => Article(
-    //         url: urls[index],
-    //         title: titles[index],
-    //         urlImage: images[index],
-    //         price: double.parse(prices[index]),
-    //         reviews: reviews[index],
-    //       ),
-    //     ),
-    //   );
-    // });
   }
 
   TextEditingController searchword = TextEditingController();
@@ -262,6 +244,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                         await getAmazonData();
                         await getFlipkartData();
+                        articles.sort(
+                          (a, b) => a.price.compareTo(b.price),
+                        );
                         setState(() {
                           isLoading = false;
                         });
@@ -291,7 +276,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Expanded(
                 child: GridView.builder(
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: MediaQuery.of(context).size.width /
@@ -302,11 +287,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemBuilder: (context, index) {
                     final article = articles[index];
                     return Container(
-                      margin: EdgeInsets.all(10),
-                      // padding: EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: Color(0xFFEEEFF2),
+                        color: const Color(0xFFEEEFF2),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -321,7 +306,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 )),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
@@ -333,7 +318,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   Text(
                                     article.title,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -343,42 +328,65 @@ class _MyHomePageState extends State<MyHomePage> {
                                     children: [
                                       Text(
                                         '\₹ ${article.price.toString()}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Color(0xff26577C),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12.0, horizontal: 12),
-                                          child: FaIcon(
-                                            FontAwesomeIcons.chevronRight,
-                                            color: Colors.white,
-                                            size: 13,
-                                          ),
-                                        ),
-                                      ),
+                                      article.store == 'flipkart'
+                                          ? Container(
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: const Color(0xff26577C),
+                                              ),
+                                              child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      // vertical: 12.0,
+                                                      // horizontal: 12,
+                                                      ),
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                      'assets/images/flipkart.png',
+                                                    ),
+                                                  )
+                                                  // FaIcon(
+                                                  //   FontAwesomeIcons.chevronRight,
+                                                  //   color: Colors.white,
+                                                  //   size: 13,
+                                                  // ),
+                                                  ),
+                                            )
+                                          : Container(
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: const Color(0xff26577C),
+                                              ),
+                                              child: const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      // vertical: 12.0,
+                                                      // horizontal: 12,
+                                                      ),
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                      'assets/images/amazon.png',
+                                                    ),
+                                                  )
+                                                  // FaIcon(
+                                                  //   FontAwesomeIcons.chevronRight,
+                                                  //   color: Colors.white,
+                                                  //   size: 13,
+                                                  // ),
+                                                  ),
+                                            )
                                     ],
                                   ),
                                 ]),
                           )
                         ],
                       ),
-                    );
-                    ListTile(
-                      leading: Image.network(
-                        article.urlImage,
-                        width: 50,
-                        fit: BoxFit.fitHeight,
-                      ),
-                      title: Text(article.title),
-                      // subtitle: Text(article.price.toString()),
-                      subtitle: Text(article.price.toString()),
                     );
                   },
                 ),
