@@ -41,6 +41,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Article> articles = [];
+  List<Article> filtered = [];
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future getFlipkartData() async {
     List<String> terms = search!.split(' ');
+    List<String> copy = search!.split(' ');
     int i = 0;
     for (String x in terms) {
       try {
@@ -106,26 +109,49 @@ class _MyHomePageState extends State<MyHomePage> {
 
     avg = avg / 5;
 
+    List<Article> temp = [];
+
     for (int i = 0; i < 5; i++) {
       if (double.parse(prices[i]) > (avg / 2) &&
           double.parse(prices[i]) < (avg * 1.5)) {
-        setState(() {
-          articles.add(
-            Article(
-              url: 'urls[i]',
-              title: titles[i],
-              store: 'flipkart',
-              urlImage: images[i],
-              price: double.parse(prices[i]),
-              reviews: reviews[i],
-            ),
-          );
-        });
+        temp.add(
+          Article(
+            url: 'urls[i]',
+            title: titles[i],
+            store: 'flipkart',
+            urlImage: images[i],
+            price: double.parse(prices[i]),
+            reviews: reviews[i],
+          ),
+        );
       }
     }
+
+    for (int i = 0; i < temp.length; i++) {
+      bool exist = true;
+      copy.every(
+        (searchTerm) {
+          if (temp[i].title.split(' ').contains(searchTerm)) {
+            exist = true;
+          } else {
+            exist = false;
+          }
+          return true;
+        },
+      );
+      if (exist) {
+        print('${temp[i].title} is added');
+        filtered.add(temp[i]);
+      }
+    }
+
+    print(filtered.length);
+    setState(() {});
   }
 
   Future getAmazonData() async {
+    List<String> copy = search!.split(' ');
+
     String term = search!.replaceAll(' ', '+');
     final url = Uri.parse('https://www.amazon.in/s?k=$term&ref=nb_sb_noss_2');
     final response = await http.get(url);
@@ -164,24 +190,41 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     avg = avg / 5;
-
+    List<Article> temp = [];
     for (int i = 0; i < 5; i++) {
       if (double.parse(prices[i]) > (avg / 2) &&
           double.parse(prices[i]) < (avg * 1.5)) {
-        setState(() {
-          articles.add(
-            Article(
-              url: urls[i],
-              title: titles[i],
-              store: 'amazon',
-              urlImage: images[i],
-              price: double.parse(prices[i]),
-              reviews: reviews[i],
-            ),
-          );
-        });
+        temp.add(
+          Article(
+            url: urls[i],
+            title: titles[i],
+            store: 'amazon',
+            urlImage: images[i],
+            price: double.parse(prices[i]),
+            reviews: reviews[i],
+          ),
+        );
       }
     }
+    for (int i = 0; i < temp.length; i++) {
+      bool exist = true;
+      copy.every(
+        (searchTerm) {
+          if (temp[i].title.split(' ').contains(searchTerm)) {
+            exist = true;
+          } else {
+            exist = false;
+          }
+          return true;
+        },
+      );
+      if (exist) {
+        print('${temp[i].title} is added');
+        filtered.add(temp[i]);
+      }
+    }
+
+    setState(() {});
   }
 
   TextEditingController searchword = TextEditingController();
@@ -237,6 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         hintText: 'Enter a search item',
                       ),
                       onSubmitted: (value) async {
+                        filtered.clear();
                         setState(() {
                           isLoading = true;
                           search = value;
@@ -283,9 +327,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ((MediaQuery.of(context).size.height * 0.75)),
                   ),
                   padding: const EdgeInsets.all(12),
-                  itemCount: articles.length,
+                  itemCount: filtered.length,
                   itemBuilder: (context, index) {
-                    final article = articles[index];
+                    final article = filtered[index];
                     return Container(
                       margin: const EdgeInsets.all(10),
                       padding: EdgeInsets.all(6),
