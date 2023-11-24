@@ -1,60 +1,188 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pricecompare/components/firebase_auth.dart';
-import 'package:provider/provider.dart';
+import 'package:pricecompare/screens/signup.dart';
+
+import '../components/auth_methods.dart';
+import 'homescreen.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  const Login({Key? key}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  void login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthMethods().loginUser(
+        email: _emailController.text, password: _passwordController.text);
+    if (res == 'success') {
+      final user = FirebaseAuth.instance.currentUser!;
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute(builder: (_) => HomeScreen()));
+    } else {}
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController email = TextEditingController();
-    final TextEditingController password = TextEditingController();
-    final authService = Provider.of<AuthService>(context);
+    final double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: email,
-              decoration: InputDecoration(labelText: 'Email Id'),
-            ),
-            TextField(
-              controller: password,
-              decoration: InputDecoration(labelText: 'Password'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await authService.signInWithEmailAndPassword(
-                    email.text.trim(), password.text.trim());
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-              ),
-              child: Text('Login'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/signup');
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.fromHeight(50),
-              ),
-              child: Text('Register'),
-            )
-          ],
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Log In'),
         ),
-      ),
-    );
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                      height: height * 0.4,
+                      child: Image(
+                          image: AssetImage('assets/images/comment.png'))),
+                  Container(
+                    padding: const EdgeInsets.only(
+                        top: 0.0, left: 20.0, right: 20.0),
+                    child: Form(
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _emailController,
+                            textInputAction: TextInputAction.done,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color(0xFFC31DC7),
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFC31DC7),
+                                ),
+                              ),
+                              labelText: 'Email',
+                              labelStyle: TextStyle(),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextField(
+                            obscureText: true,
+                            controller: _passwordController,
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color(0xFFC31DC7),
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(
+                                  color: Color(0xFFC31DC7),
+                                ),
+                              ),
+                              labelText: 'Password',
+                              labelStyle: const TextStyle(),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const SizedBox(
+                            height: 60,
+                          ),
+                          GestureDetector(
+                            onTap: login,
+                            child: SizedBox(
+                              height: 60.0,
+                              child: Material(
+                                borderRadius: BorderRadius.circular(10.0),
+                                shadowColor: Colors.blueAccent,
+                                color: Color(0xFFC31DC7),
+                                elevation: 0,
+                                child: Center(
+                                  child: _isLoading
+                                      ? Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Text(
+                                          'LOGIN',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Create an',
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      InkWell(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => Signup(),
+                          ),
+                        ),
+                        child: const Text(
+                          'account here',
+                          style: TextStyle(
+                            color: Color(0xFFC31DC7),
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 }
