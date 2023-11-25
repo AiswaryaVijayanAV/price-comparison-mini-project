@@ -78,13 +78,13 @@ class _LoginState extends State<Login> {
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Color(0xFFC31DC7),
+                                  color: Color.fromARGB(255, 246, 154, 142),
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                                 borderSide: BorderSide(
-                                  color: Color(0xFFC31DC7),
+                                  color: Color.fromARGB(255, 246, 154, 142),
                                 ),
                               ),
                               labelText: 'Email',
@@ -100,13 +100,13 @@ class _LoginState extends State<Login> {
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Color(0xFFC31DC7),
+                                  color: Color.fromARGB(255, 246, 154, 142),
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                                 borderSide: BorderSide(
-                                  color: Color(0xFFC31DC7),
+                                  color: Color.fromARGB(255, 246, 154, 142),
                                 ),
                               ),
                               labelText: 'Password',

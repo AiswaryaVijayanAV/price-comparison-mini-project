@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
 import 'package:pricecompare/components/auth_methods.dart';
 import 'package:pricecompare/screens/bookmarks.dart';
+import 'package:pricecompare/screens/profile.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -217,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
     List<dynamic> widgetTabs = [
       SearchPage(width, height, context),
       BookmarksScreen(),
-      ProfilePage(),
+      UserProfile(),
     ];
     return Scaffold(
       appBar: AppBar(
