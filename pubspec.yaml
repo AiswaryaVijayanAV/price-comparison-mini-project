@@ -36,11 +36,13 @@ dependencies:
   firebase_storage: ^11.5.2
   flutter:
     sdk: flutter
+  flutter_animated_icons: ^1.0.1
   font_awesome_flutter: ^10.6.0
   google_nav_bar: ^5.0.6
   html: ^0.15.4
   http: ^1.1.0
   image_picker: ^1.0.4
+  lottie: ^1.4.3
   provider: ^6.1.1
   url_launcher: ^6.2.1
   uuid: ^4.2.1

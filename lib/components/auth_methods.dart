@@ -59,6 +59,43 @@ class AuthMethods {
     return res;
   }
 
+  Future<String> bookmark({
+    required String url,
+    required String store,
+    required String title,
+    required String urlImage,
+    required double price,
+  }) async {
+    String result = "some error occured";
+    try {
+      if (url.isNotEmpty && store.isNotEmpty) {
+        await _firestore
+            .collection('bookmarks')
+            .doc(_auth.currentUser!.uid)
+            .set(
+          {
+            'bookmarks': FieldValue.arrayUnion([
+              {
+                'url': url,
+                'title': title,
+                'store': store,
+                'uid': _auth.currentUser!.uid,
+                'urlImage': urlImage,
+                'price': price,
+              }
+            ]),
+          },
+          SetOptions(merge: true),
+        );
+
+        result = "success";
+      }
+    } catch (err) {
+      result = err.toString();
+    }
+    return result;
+  }
+
   Future<void> signOut() async {
     await _auth.signOut();
   }

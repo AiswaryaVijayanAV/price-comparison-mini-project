@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,6 +7,8 @@ import 'package:pricecompare/article.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:html/dom.dart' as dom;
+import 'package:pricecompare/components/auth_methods.dart';
+import 'package:pricecompare/screens/bookmarks.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -213,7 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
     double width = MediaQuery.of(context).size.width;
     List<dynamic> widgetTabs = [
       SearchPage(width, height, context),
-      Bookmarks()
+      BookmarksScreen(),
+      ProfilePage(),
     ];
     return Scaffold(
       appBar: AppBar(
@@ -262,12 +266,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.bookmark,
                 text: 'Bookmarks',
               ),
+              GButton(
+                icon: Icons.person,
+                text: 'Profile',
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+  Center ProfilePage() => Center(
+        child: Text('Profile page'),
+      );
 
   Center Bookmarks() => Center(child: Text('Bookmarks'));
 
@@ -380,12 +392,41 @@ class _HomeScreenState extends State<HomeScreen> {
                               Positioned(
                                   top: 0,
                                   right: 0,
-                                  child: Container(
-                                      color: Colors.white,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Icon(Icons.bookmark),
-                                      ))),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      AuthMethods().bookmark(
+                                        url: article.url,
+                                        price: article.price,
+                                        store: article.store,
+                                        title: article.title,
+                                        urlImage: article.urlImage,
+                                      );
+
+                                      final snackBar = SnackBar(
+                                        /// need to set following properties for best effect of awesome_snackbar_content
+                                        elevation: 0,
+                                        behavior: SnackBarBehavior.floating,
+                                        backgroundColor: Colors.transparent,
+                                        content: AwesomeSnackbarContent(
+                                          title: 'Added',
+                                          message: 'Go to bookmarks section.',
+
+                                          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                          contentType: ContentType.success,
+                                        ),
+                                      );
+
+                                      ScaffoldMessenger.of(context)
+                                        ..hideCurrentSnackBar()
+                                        ..showSnackBar(snackBar);
+                                    },
+                                    child: Container(
+                                        color: Colors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Icon(Icons.bookmark),
+                                        )),
+                                  )),
                             ],
                           ),
                         ),
