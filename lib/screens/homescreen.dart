@@ -6,6 +6,7 @@ import 'package:pricecompare/article.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:html/dom.dart' as dom;
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -344,119 +345,131 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: filtered.length,
               itemBuilder: (context, index) {
                 final article = filtered[index];
-                return Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color(0xFFEEEFF2),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        height: 130,
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                article.urlImage,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                                top: 0,
-                                right: 0,
-                                child: Container(
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(Icons.bookmark),
-                                    ))),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                return GestureDetector(
+                  onTap: () async {
+                    String url = article.url;
+                    print(url);
+                    var urllaunchable = await canLaunchUrl(Uri.parse(url));
+                    if (urllaunchable) {
+                      await launchUrl(Uri.parse(url));
+                    } else {
+                      print("URL can't be launched.");
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFFEEEFF2),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: 130,
+                          child: Stack(
                             children: [
-                              Text(
-                                article.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  article.urlImage,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(
-                                    '\₹ ${article.price.toString()}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                      color: Colors.white,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(Icons.bookmark),
+                                      ))),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  article.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  article.store == 'flipkart'
-                                      ? Container(
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: const Color(0xff26577C),
-                                          ),
-                                          child: const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  // vertical: 12.0,
-                                                  // horizontal: 12,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Text(
+                                      '\₹ ${article.price.toString()}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    article.store == 'flipkart'
+                                        ? Container(
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: const Color(0xff26577C),
+                                            ),
+                                            child: const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    // vertical: 12.0,
+                                                    // horizontal: 12,
+                                                    ),
+                                                child: Image(
+                                                  image: AssetImage(
+                                                    'assets/images/flipkart.png',
                                                   ),
-                                              child: Image(
-                                                image: AssetImage(
-                                                  'assets/images/flipkart.png',
+                                                )
+                                                // FaIcon(
+                                                //   FontAwesomeIcons.chevronRight,
+                                                //   color: Colors.white,
+                                                //   size: 13,
+                                                // ),
                                                 ),
-                                              )
-                                              // FaIcon(
-                                              //   FontAwesomeIcons.chevronRight,
-                                              //   color: Colors.white,
-                                              //   size: 13,
-                                              // ),
-                                              ),
-                                        )
-                                      : Container(
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: const Color(0xff26577C),
-                                          ),
-                                          child: const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  // vertical: 12.0,
-                                                  // horizontal: 12,
+                                          )
+                                        : Container(
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: const Color(0xff26577C),
+                                            ),
+                                            child: const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    // vertical: 12.0,
+                                                    // horizontal: 12,
+                                                    ),
+                                                child: Image(
+                                                  image: AssetImage(
+                                                    'assets/images/amazon.png',
                                                   ),
-                                              child: Image(
-                                                image: AssetImage(
-                                                  'assets/images/amazon.png',
+                                                )
+                                                // FaIcon(
+                                                //   FontAwesomeIcons.chevronRight,
+                                                //   color: Colors.white,
+                                                //   size: 13,
+                                                // ),
                                                 ),
-                                              )
-                                              // FaIcon(
-                                              //   FontAwesomeIcons.chevronRight,
-                                              //   color: Colors.white,
-                                              //   size: 13,
-                                              // ),
-                                              ),
-                                        )
-                                ],
-                              ),
-                            ]),
-                      )
-                    ],
+                                          )
+                                  ],
+                                ),
+                              ]),
+                        )
+                      ],
+                    ),
                   ),
                 );
               },
