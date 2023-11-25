@@ -64,7 +64,7 @@ class _LoginState extends State<Login> {
                   Container(
                       height: height * 0.4,
                       child: Image(
-                          image: AssetImage('assets/images/comment.png'))),
+                          image: AssetImage('assets/images/shopping.png'))),
                   Container(
                     padding: const EdgeInsets.only(
                         top: 0.0, left: 20.0, right: 20.0),
@@ -82,7 +82,7 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
+                                borderRadius: BorderRadius.circular(20.0),
                                 borderSide: BorderSide(
                                   color: Color(0xFFC31DC7),
                                 ),
@@ -104,7 +104,7 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
+                                borderRadius: BorderRadius.circular(20.0),
                                 borderSide: BorderSide(
                                   color: Color(0xFFC31DC7),
                                 ),
@@ -124,9 +124,9 @@ class _LoginState extends State<Login> {
                             child: SizedBox(
                               height: 60.0,
                               child: Material(
-                                borderRadius: BorderRadius.circular(10.0),
+                                borderRadius: BorderRadius.circular(20.0),
                                 shadowColor: Colors.blueAccent,
-                                color: Color(0xFFC31DC7),
+                                color: Color.fromARGB(255, 246, 154, 142),
                                 elevation: 0,
                                 child: Center(
                                   child: _isLoading
@@ -156,12 +156,6 @@ class _LoginState extends State<Login> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Create an',
-                      ),
-                      const SizedBox(
-                        width: 5.0,
-                      ),
                       InkWell(
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
@@ -169,9 +163,9 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         child: const Text(
-                          'account here',
+                          'signup here',
                           style: TextStyle(
-                            color: Color(0xFFC31DC7),
+                            color: Color.fromARGB(255, 246, 154, 142),
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),

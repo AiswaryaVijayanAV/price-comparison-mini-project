@@ -62,7 +62,7 @@ class _SignupState extends State<Signup> {
     return Scaffold(
         // resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: Text('Join Us'),
+          title: Text('Create Account'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -86,7 +86,7 @@ class _SignupState extends State<Signup> {
                               : const CircleAvatar(
                                   radius: 64,
                                   backgroundColor:
-                                      Color.fromARGB(255, 204, 136, 206),
+                                      Color.fromARGB(255, 246, 154, 142),
                                 ),
                           Positioned(
                             bottom: -5,
@@ -109,7 +109,8 @@ class _SignupState extends State<Signup> {
                         TextField(
                           controller: _nameController,
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0)),
                             labelText: 'name',
                             labelStyle: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -123,7 +124,8 @@ class _SignupState extends State<Signup> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0)),
                             labelText: 'email',
                             labelStyle: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -138,7 +140,7 @@ class _SignupState extends State<Signup> {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
+                                borderRadius: BorderRadius.circular(20.0)),
                             labelText: 'password',
                             labelStyle: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -153,7 +155,7 @@ class _SignupState extends State<Signup> {
                           controller: _confirmPassword,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
+                                borderRadius: BorderRadius.circular(20.0)),
                             labelText: 'confirm password',
                             labelStyle: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -201,9 +203,9 @@ class _SignupState extends State<Signup> {
                           child: SizedBox(
                             height: 60.0,
                             child: Material(
-                              borderRadius: BorderRadius.circular(10.0),
+                              borderRadius: BorderRadius.circular(20.0),
                               shadowColor: Colors.blueAccent,
-                              color: Color(0xFFC31DC7),
+                              color: Color.fromARGB(255, 246, 154, 142),
                               elevation: 0,
                               child: Center(
                                 child: Text(

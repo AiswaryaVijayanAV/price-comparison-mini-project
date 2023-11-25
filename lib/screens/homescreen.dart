@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:pricecompare/article.dart';
 import 'package:http/http.dart' as http;
 
@@ -204,219 +205,269 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchword = TextEditingController();
   String? search;
   bool isLoading = false;
-
+  int Pageindex = 0;
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leadingWidth: width * 0.8,
-          leading: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Discover',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: width * 0.08,
-                  ),
+    List<dynamic> widgetTabs = [
+      SearchPage(width, height, context),
+      Bookmarks()
+    ];
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        leadingWidth: width * 0.8,
+        leading: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Discover',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: width * 0.08,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+      ),
+      body: widgetTabs[Pageindex],
+      bottomNavigationBar: Container(
+        color: Colors.black,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+          child: GNav(
+            backgroundColor: Colors.black,
+            color: Colors.white,
+            tabBackgroundColor: Colors.grey.shade800,
+            padding: EdgeInsets.all(16),
+            activeColor: Colors.white,
+            gap: 8,
+            onTabChange: (value) {
+              setState(() {
+                Pageindex = value;
+              });
+            },
+            tabs: [
+              GButton(
+                icon: Icons.home,
+                text: 'Home',
+              ),
+              GButton(
+                icon: Icons.bookmark,
+                text: 'Bookmarks',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Center Bookmarks() => Center(child: Text('Bookmarks'));
+
+  Padding SearchPage(double width, double height, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: width * 0.8,
-                    child: TextField(
-                      controller: searchword,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(
-                            color: Colors.grey,
-                          ),
-                        ),
-                        hintStyle: const TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Enter a search item',
-                      ),
-                      onSubmitted: (value) async {
-                        filtered.clear();
-                        setState(() {
-                          isLoading = true;
-                          search = value;
-                          articles.clear();
-                        });
-                        await getAmazonData();
-                        await getFlipkartData();
-                        articles.sort(
-                          (a, b) => a.price.compareTo(b.price),
-                        );
-                        setState(() {
-                          isLoading = false;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Container(
-                      height: height * 0.08,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4edb86),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Align(
-                        alignment: Alignment.center,
-                        child: FaIcon(
-                          FontAwesomeIcons.searchengin,
-                          color: Colors.white,
-                        ),
+              SizedBox(
+                width: width * 0.8,
+                child: TextField(
+                  controller: searchword,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(
+                        color: Colors.grey,
                       ),
                     ),
+                    hintStyle: const TextStyle(
+                      color: Colors.black,
+                    ),
+                    hintText: 'Enter a search item',
                   ),
-                ],
+                  onSubmitted: (value) async {
+                    filtered.clear();
+                    setState(() {
+                      isLoading = true;
+                      search = value;
+                      articles.clear();
+                    });
+                    await getAmazonData();
+                    await getFlipkartData();
+                    articles.sort(
+                      (a, b) => a.price.compareTo(b.price),
+                    );
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(
+                width: 10,
               ),
               Expanded(
-                child: GridView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: MediaQuery.of(context).size.width /
-                        ((MediaQuery.of(context).size.height * 0.75)),
+                child: Container(
+                  height: height * 0.08,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4edb86),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  padding: const EdgeInsets.all(12),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final article = filtered[index];
-                    return Container(
-                      margin: const EdgeInsets.all(10),
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color(0xFFEEEFF2),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            height: 130,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  article.urlImage,
-                                  fit: BoxFit.cover,
-                                )),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
+                  child: const Align(
+                    alignment: Alignment.center,
+                    child: FaIcon(
+                      FontAwesomeIcons.searchengin,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: GridView.builder(
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: MediaQuery.of(context).size.width /
+                    ((MediaQuery.of(context).size.height * 0.75)),
+              ),
+              padding: const EdgeInsets.all(12),
+              itemCount: filtered.length,
+              itemBuilder: (context, index) {
+                final article = filtered[index];
+                return Container(
+                  margin: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFFEEEFF2),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        height: 130,
+                        child: Stack(
+                          children: [
+                            ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
+                              child: Image.network(
+                                article.urlImage,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            child: Column(
+                            Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                    color: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(Icons.bookmark),
+                                    ))),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                article.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    article.title,
+                                    '\₹ ${article.price.toString()}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Text(
-                                        '\₹ ${article.price.toString()}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      article.store == 'flipkart'
-                                          ? Container(
-                                              height: 30,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: const Color(0xff26577C),
-                                              ),
-                                              child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      // vertical: 12.0,
-                                                      // horizontal: 12,
-                                                      ),
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                      'assets/images/flipkart.png',
-                                                    ),
-                                                  )
-                                                  // FaIcon(
-                                                  //   FontAwesomeIcons.chevronRight,
-                                                  //   color: Colors.white,
-                                                  //   size: 13,
-                                                  // ),
+                                  article.store == 'flipkart'
+                                      ? Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: const Color(0xff26577C),
+                                          ),
+                                          child: const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  // vertical: 12.0,
+                                                  // horizontal: 12,
                                                   ),
-                                            )
-                                          : Container(
-                                              height: 30,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: const Color(0xff26577C),
+                                              child: Image(
+                                                image: AssetImage(
+                                                  'assets/images/flipkart.png',
+                                                ),
+                                              )
+                                              // FaIcon(
+                                              //   FontAwesomeIcons.chevronRight,
+                                              //   color: Colors.white,
+                                              //   size: 13,
+                                              // ),
                                               ),
-                                              child: const Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      // vertical: 12.0,
-                                                      // horizontal: 12,
-                                                      ),
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                      'assets/images/amazon.png',
-                                                    ),
-                                                  )
-                                                  // FaIcon(
-                                                  //   FontAwesomeIcons.chevronRight,
-                                                  //   color: Colors.white,
-                                                  //   size: 13,
-                                                  // ),
+                                        )
+                                      : Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: const Color(0xff26577C),
+                                          ),
+                                          child: const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  // vertical: 12.0,
+                                                  // horizontal: 12,
                                                   ),
-                                            )
-                                    ],
-                                  ),
-                                ]),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Container(),
-            ],
+                                              child: Image(
+                                                image: AssetImage(
+                                                  'assets/images/amazon.png',
+                                                ),
+                                              )
+                                              // FaIcon(
+                                              //   FontAwesomeIcons.chevronRight,
+                                              //   color: Colors.white,
+                                              //   size: 13,
+                                              // ),
+                                              ),
+                                        )
+                                ],
+                              ),
+                            ]),
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-        ),
+          isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Container(),
+        ],
       ),
     );
   }
